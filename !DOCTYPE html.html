@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+	<title></title>
+	<meta name="generator" content="LibreOffice 26.8.0.3 (Linux)"/>
+	<meta name="created" content="00:00:00"/>
+	<meta name="changed" content="00:00:00"/>
+	<style type="text/css">
+		@page { size: 8.27in 11.69in; margin: 0.79in }
+		p { margin-bottom: 0.1in; line-height: 115%; background: transparent }
+		pre { font-size: 10pt; font-family: "Liberation Mono", monospace; background: transparent }
+	</style>
+</head>
+<body lang="en-US" link="#000080" vlink="#800000" dir="ltr"><pre>&lt;!DOCTYPE html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;UTF-8&quot; /&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1.0&quot; /&gt;
+  &lt;title&gt;Colonial Education Motion Quiz&lt;/title&gt;
+  &lt;script src=&quot;https://cdn.tailwindcss.com&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js&quot; crossorigin=&quot;anonymous&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js&quot;&gt;&lt;/script&gt;
+  &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js&quot;&gt;&lt;/script&gt;
+  &lt;style&gt;
+    @keyframes floatDown {
+      0% { transform: translateY(-100px) rotate(0deg); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(105vh) rotate(360deg); opacity: 0; }
+    }
+    .floating-artifact {
+      position: absolute;
+      animation: floatDown linear infinite;
+      cursor: pointer;
+      user-select: none;
+      touch-action: none;
+    }
+    .bg-sepia-900 { background-color: #2c1d11; }
+    .bg-sepia-800 { background-color: #3d2919; }
+    .bg-sepia-700 { background-color: #5c3e26; }
+    .border-sepia-800 { border-color: #3d2919; }
+    .border-sepia-700 { border-color: #5c3e26; }
+    .border-sepia-600 { border-color: #7c5433; }
+    .border-sepia-500 { border-color: #9c6a40; }
+    .text-sepia-200 { color: #f3e5d8; }
+    .text-sepia-300 { color: #e6cbab; }
+    .text-sepia-400 { color: #d4ab7e; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body class=&quot;bg-stone-950 text-stone-100 font-sans h-screen w-screen overflow-hidden select-none&quot;&gt;
+
+  &lt;!-- HEADER HUD (Fixed Height) --&gt;
+  &lt;header id=&quot;main-header&quot; class=&quot;fixed top-0 left-0 right-0 z-30 h-14 sm:h-16 flex items-center justify-between px-3 sm:px-6 bg-stone-900/95 border-b border-sepia-800 backdrop-blur-md shadow-lg&quot;&gt;
+    &lt;div class=&quot;flex items-center space-x-2 sm:space-x-3&quot;&gt;
+      &lt;span class=&quot;text-lg sm:text-2xl&quot;&gt;📜&lt;/span&gt;
+      &lt;div&gt;
+        &lt;h1 class=&quot;font-serif text-xs sm:text-base font-bold text-sepia-300 leading-tight&quot;&gt;Colonial Education Malaya&lt;/h1&gt;
+        &lt;p class=&quot;text-[10px] sm:text-xs text-stone-400&quot;&gt;Interactive Motion &amp; Touch Quest&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;div class=&quot;flex items-center space-x-2 sm:space-x-6&quot;&gt;
+      &lt;div id=&quot;score-display&quot; class=&quot;font-mono text-xs sm:text-lg font-bold text-amber-400 bg-stone-950 px-2.5 py-1 rounded-lg border border-amber-500/30&quot;&gt;
+        Score: 0
+      &lt;/div&gt;
+      &lt;div id=&quot;q-counter-display&quot; class=&quot;font-mono text-xs sm:text-sm text-stone-300 bg-stone-950 px-2.5 py-1 rounded-lg border border-stone-800&quot;&gt;
+        0/10
+      &lt;/div&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Controls &amp; Tracking Indicator --&gt;
+    &lt;div class=&quot;flex items-center space-x-1.5 sm:space-x-3&quot;&gt;
+      &lt;div id=&quot;tracking-status&quot; class=&quot;flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-amber-950 border border-amber-600/50 text-amber-300&quot;&gt;
+        &lt;span id=&quot;tracking-dot&quot; class=&quot;w-2 h-2 rounded-full bg-amber-500 animate-pulse&quot;&gt;&lt;/span&gt;
+        &lt;span id=&quot;tracking-status-text&quot; class=&quot;truncate max-w-[100px] sm:max-w-none&quot;&gt;Cam Starting...&lt;/span&gt;
+      &lt;/div&gt;
+
+      &lt;button onclick=&quot;toggleSettingsModal()&quot; class=&quot;p-1.5 sm:p-2 rounded-lg bg-stone-800 hover:bg-stone-700 text-sepia-300 border border-sepia-800 transition text-xs sm:text-base&quot; title=&quot;Settings&quot;&gt;
+        ⚙️
+      &lt;/button&gt;
+    &lt;/div&gt;
+  &lt;/header&gt;
+
+  &lt;!-- MAIN CANVAS &amp; HUD CONTAINER (Padded Top for Header Clear) --&gt;
+  &lt;main class=&quot;relative w-full h-full pt-14 sm:pt-16 flex flex-col items-center justify-center bg-stone-950 overflow-hidden&quot;&gt;
+    
+    &lt;!-- FULLSCREEN WEBCAM BACKGROUND (Crystal Clear with no blur) --&gt;
+    &lt;div id=&quot;full-webcam-container&quot; class=&quot;absolute inset-0 w-full h-full z-0 overflow-hidden&quot;&gt;
+      &lt;video id=&quot;webcam-video&quot; class=&quot;w-full h-full object-cover -scale-x-100&quot; playsinline muted autoplay&gt;&lt;/video&gt;
+    &lt;/div&gt;
+
+    &lt;!-- Render Canvas for Floating Items, Tracking &amp; Particles --&gt;
+    &lt;canvas id=&quot;game-canvas&quot; class=&quot;absolute inset-0 w-full h-full object-cover z-10 pointer-events-none&quot;&gt;&lt;/canvas&gt;
+
+    &lt;!-- Floating Artifact Container for Stage Mode --&gt;
+    &lt;div id=&quot;floating-artifacts-layer&quot; class=&quot;absolute inset-0 z-15 pointer-events-none overflow-hidden pt-14 sm:pt-16&quot;&gt;&lt;/div&gt;
+
+    &lt;!-- Interactive Overlay Layer --&gt;
+    &lt;div id=&quot;ui-layer&quot; class=&quot;relative z-20 w-full h-full max-w-5xl mx-auto p-2 sm:p-4 flex flex-col justify-between pointer-events-none overflow-y-auto&quot;&gt;
+      
+      &lt;!-- Motion Cursor Visual Indicator --&gt;
+      &lt;div id=&quot;dwell-cursor&quot; class=&quot;fixed hidden pointer-events-none z-50 transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 sm:border-4 border-amber-400 bg-amber-500/20 flex items-center justify-center transition-transform&quot;&gt;
+        &lt;div id=&quot;dwell-fill&quot; class=&quot;w-full h-full bg-amber-400/40 rounded-full scale-0 origin-center transition-transform&quot;&gt;&lt;/div&gt;
+        &lt;span id=&quot;dwell-icon&quot; class=&quot;absolute text-base sm:text-xl&quot;&gt;👉&lt;/span&gt;
+      &lt;/div&gt;
+
+      &lt;!-- DYNAMIC GAME CONTENT CONTAINER --&gt;
+      &lt;div id=&quot;stage-container&quot; class=&quot;w-full h-full flex flex-col items-center justify-center pointer-events-auto my-auto py-2&quot;&gt;
+        &lt;!-- Content injected dynamically via JS --&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/main&gt;
+
+  &lt;!-- MODAL: SETTINGS &amp; ACCESSIBILITY --&gt;
+  &lt;div id=&quot;settings-modal&quot; class=&quot;fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center p-4&quot;&gt;
+    &lt;div class=&quot;bg-stone-900 border border-sepia-600 rounded-2xl max-w-md w-full p-6 text-stone-200 shadow-2xl space-y-5&quot;&gt;
+      &lt;div class=&quot;flex justify-between items-center border-b border-stone-800 pb-3&quot;&gt;
+        &lt;h3 class=&quot;font-serif text-xl text-sepia-300 font-bold&quot;&gt;Settings &amp; Audio Controls&lt;/h3&gt;
+        &lt;button onclick=&quot;toggleSettingsModal()&quot; class=&quot;text-stone-400 hover:text-white text-lg&quot;&gt;✕&lt;/button&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;space-y-4 text-sm&quot;&gt;
+        &lt;div class=&quot;flex items-center justify-between&quot;&gt;
+          &lt;span&gt;Webcam Hand Tracking&lt;/span&gt;
+          &lt;button id=&quot;toggle-camera-btn&quot; onclick=&quot;toggleCameraState()&quot; class=&quot;px-3 py-1.5 rounded-lg bg-sepia-700 hover:bg-sepia-600 text-white font-semibold transition&quot;&gt;
+            Enable Camera
+          &lt;/button&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;flex items-center justify-between&quot;&gt;
+          &lt;div&gt;
+            &lt;div class=&quot;font-medium&quot;&gt;Sound Effects (Synthesized Audio)&lt;/div&gt;
+            &lt;div class=&quot;text-xs text-stone-400&quot;&gt;Plays feedback tones, sound FX &amp; applause&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;input type=&quot;checkbox&quot; id=&quot;sound-toggle&quot; checked onchange=&quot;updateSoundSetting()&quot; class=&quot;w-5 h-5 accent-sepia-500 rounded cursor-pointer&quot; /&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;flex items-center justify-between&quot;&gt;
+          &lt;div&gt;
+            &lt;div class=&quot;font-medium&quot;&gt;Background Music&lt;/div&gt;
+            &lt;div class=&quot;text-xs text-stone-400&quot;&gt;Relaxing, joyful synthesized ambient melody&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;input type=&quot;checkbox&quot; id=&quot;music-toggle&quot; checked onchange=&quot;updateMusicSetting()&quot; class=&quot;w-5 h-5 accent-sepia-500 rounded cursor-pointer&quot; /&gt;
+        &lt;/div&gt;
+
+        &lt;div class=&quot;flex items-center justify-between&quot;&gt;
+          &lt;div&gt;
+            &lt;div class=&quot;font-medium&quot;&gt;Dwell Selection Fallback&lt;/div&gt;
+            &lt;div class=&quot;text-xs text-stone-400&quot;&gt;Select answers by hovering for 1.4s&lt;/div&gt;
+          &lt;/div&gt;
+          &lt;input type=&quot;checkbox&quot; id=&quot;dwell-toggle&quot; checked onchange=&quot;updateDwellSetting()&quot; class=&quot;w-5 h-5 accent-sepia-500 rounded cursor-pointer&quot; /&gt;
+        &lt;/div&gt;
+
+        &lt;div id=&quot;iframe-warning&quot; class=&quot;p-3 rounded-lg bg-amber-950/60 border border-amber-700/50 text-xs text-amber-200 space-y-2&quot;&gt;
+          &lt;p class=&quot;font-bold&quot;&gt;🔗 Standalone Link &amp; Sharing&lt;/p&gt;
+          &lt;p class=&quot;text-[11px] text-stone-300&quot;&gt;If camera permissions are blocked, open or copy this application link directly:&lt;/p&gt;
+          &lt;div class=&quot;flex space-x-2&quot;&gt;
+            &lt;button onclick=&quot;openDirectLink()&quot; class=&quot;px-3 py-1.5 bg-sepia-700 hover:bg-sepia-600 text-white font-semibold rounded text-xs&quot;&gt;
+              Open in New Tab ↗
+            &lt;/button&gt;
+            &lt;button onclick=&quot;copyDirectLink()&quot; id=&quot;copy-btn&quot; class=&quot;px-3 py-1.5 bg-stone-800 hover:bg-stone-700 text-stone-200 font-semibold rounded text-xs border border-stone-700&quot;&gt;
+              Copy Link
+            &lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+
+      &lt;div class=&quot;pt-2 flex justify-end&quot;&gt;
+        &lt;button onclick=&quot;toggleSettingsModal()&quot; class=&quot;px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 rounded-lg text-sm font-semibold&quot;&gt;
+          Close
+        &lt;/button&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+
+  &lt;!-- MAIN SCRIPT --&gt;
+  &lt;script&gt;
+    /* ==========================================================================
+       GAME STATE &amp; GLOBAL CONSTANTS
+       ========================================================================== */
+    const GAME_STATE = {
+      mode: 'START', // 'START', 'CATCHING', 'QUIZ', 'RESULTS'
+      score: 0,
+      answeredCount: 0,
+      activeQuestion: null,
+      questionQueue: [],
+      dwellEnabled: true,
+      dwellTarget: null,
+      dwellStartTime: 0,
+      dwellDuration: 1400,
+      cooldown: false,
+      cameraActive: false,
+      trackingDetected: false,
+      trackingLossTimer: 0,
+      landmarks: null,
+      cursor: { x: 0.5, y: 0.5, isPointing: false, isOpenHand: false }
+    };
+
+    const ARTIFACT_ICONS = ['📜', '📚', '🖋️', '🎓', '🏛️', '✒️', '📖'];
+
+    const QUESTION_BANK = [
+      {
+        q: &quot;Which language was generally used as the medium of instruction in Malay vernacular schools during the British colonial era?&quot;,
+        options: [&quot;English&quot;, &quot;Malay&quot;, &quot;Tamil&quot;, &quot;Chinese&quot;],
+        answer: 1,
+        explanation: &quot;Malay vernacular schools established under colonial policy used Malay as the primary medium of instruction, focusing on basic literacy and agriculture.&quot;
+      },
+      {
+        q: &quot;Which report, published in 1951, addressed the position of Chinese-medium education in Malaya?&quot;,
+        options: [&quot;Fenn-Wu Report&quot;, &quot;Razak Report&quot;, &quot;Barnes Report&quot;, &quot;Rahman Talib Report&quot;],
+        answer: 0,
+        explanation: &quot;The Fenn-Wu Report (1951) evaluated Chinese education, advocating for Chinese-medium schools to be integrated into the national system while preserving their heritage.&quot;
+      },
+      {
+        q: &quot;In which year was the Razak Report published?&quot;,
+        options: [&quot;1946&quot;, &quot;1951&quot;, &quot;1956&quot;, &quot;1957&quot;],
+        answer: 2,
+        explanation: &quot;The Razak Report was published in 1956, forming the foundation of Malaysia's national education policy leading up to Merdeka.&quot;
+      },
+      {
+        q: &quot;Which school type generally used Tamil as its medium of instruction during the British colonial era?&quot;,
+        options: [&quot;English-medium school&quot;, &quot;Malay vernacular school&quot;, &quot;Tamil vernacular school&quot;, &quot;Chinese vernacular school&quot;],
+        answer: 2,
+        explanation: &quot;Tamil vernacular schools were primarily built on rubber plantations to cater to Indian plantation workers and used Tamil as the medium of instruction.&quot;
+      },
+      {
+        q: &quot;What was a major issue in debates about educational reform in Malaya before independence?&quot;,
+        options: [&quot;Removing academic subjects&quot;, &quot;Language policy and the organisation of education&quot;, &quot;Replacing primary schools with universities&quot;, &quot;Ending literacy education&quot;],
+        answer: 1,
+        explanation: &quot;Establishing a unified language policy and standardizing disparate vernacular streams were central to pre-independence debates.&quot;
+      },
+      {
+        q: &quot;What was one important aim of the Razak Report of 1956?&quot;,
+        options: [&quot;Developing a coordinated national education system&quot;, &quot;Abolishing all vernacular education immediately&quot;, &quot;Making English the only language of instruction&quot;, &quot;Separating education permanently by ethnic community&quot;],
+        answer: 0,
+        explanation: &quot;The Razak Report aimed to establish a unified national education system with Malay as the national language while preserving mother-tongue languages.&quot;
+      },
+      {
+        q: &quot;Which ordinance followed the Barnes and Fenn-Wu reports and addressed educational policy in 1952?&quot;,
+        options: [&quot;Education Ordinance 1952&quot;, &quot;Education Ordinance 1965&quot;, &quot;Education Ordinance 1970&quot;, &quot;Education Ordinance 1980&quot;],
+        answer: 0,
+        explanation: &quot;The Education Ordinance 1952 attempted to implement two types of national schools (Malay and English) based on recommendations from earlier reports.&quot;
+      },
+      {
+        q: &quot;Why did different communities sometimes disagree about proposed educational reforms?&quot;,
+        options: [&quot;They shared identical views about policy&quot;, &quot;They had different concerns about language, culture, and schooling&quot;, &quot;They all wanted to discontinue literacy&quot;, &quot;They opposed the existence of all schools&quot;],
+        answer: 1,
+        explanation: &quot;Different ethnic communities sought to protect their mother tongue, cultural identity, and educational opportunities in a multi-ethnic society.&quot;
+      },
+      {
+        q: &quot;Which statement best describes education in Malaya during the British colonial era?&quot;,
+        options: [&quot;All communities received identical educational opportunities&quot;, &quot;Different school systems offered varying educational opportunities&quot;, &quot;Every school used the same language&quot;, &quot;Every school followed one uniform curriculum&quot;],
+        answer: 1,
+        explanation: &quot;Colonial Malaya operated a fragmented vernacular system where curriculum, resources, and educational mobility varied greatly across streams.&quot;
+      },
+      {
+        q: &quot;Why is studying colonial education important for understanding education in Malaysia today?&quot;,
+        options: [&quot;To repeat every colonial policy&quot;, &quot;To understand historical influences on modern education and learn from them&quot;, &quot;To disregard community experiences&quot;, &quot;To avoid discussing national education&quot;],
+        answer: 1,
+        explanation: &quot;Understanding colonial education helps explain current national educational structures, language policies, and integration efforts.&quot;
+      },
+      {
+        q: &quot;What was the main purpose of the Barnes Report (1951)?&quot;,
+        options: [&quot;To propose a single national primary school system in Malay and English&quot;, &quot;To establish Chinese technical universities&quot;, &quot;To replace all vernacular schools with Tamil schools&quot;, &quot;To abolish all primary education in Malaya&quot;],
+        answer: 0,
+        explanation: &quot;The Barnes Report of 1951 recommended a unified national primary school system using Malay and English, which met opposition from non-Malay communities.&quot;
+      },
+      {
+        q: &quot;Which group of schools received significant funding and patronage from local communities, clans, and merchants?&quot;,
+        options: [&quot;Government Malay vernacular schools&quot;, &quot;Chinese vernacular schools&quot;, &quot;Estate Tamil vernacular schools&quot;, &quot;British missionary secondary schools&quot;],
+        answer: 1,
+        explanation: &quot;Chinese vernacular schools were largely built, funded, and managed by local Chinese community leaders, guilds, and clan associations.&quot;
+      },
+      {
+        q: &quot;English-medium missionary and government schools were mostly located in:&quot;,
+        options: [&quot;Remote agricultural villages&quot;, &quot;Urban centers and major towns&quot;, &quot;Rubber plantation estates&quot;, &quot;Fishing settlements along the coast&quot;],
+        answer: 1,
+        explanation: &quot;English-medium institutions were concentrated in major urban areas like Penang, Kuala Lumpur, and Ipoh, providing pathways to civil service careers.&quot;
+      },
+      {
+        q: &quot;What role did plantation management play in Tamil vernacular education?&quot;,
+        options: [&quot;They provided university scholarships to England&quot;, &quot;The Labour Code required plantation owners to provide basic primary schooling&quot;, &quot;They trained all teachers in London&quot;, &quot;They banned all forms of primary literacy&quot;],
+        answer: 1,
+        explanation: &quot;Under the Labour Code, estate owners were legally obligated to set up small primary schools if a minimum number of school-age children resided on the estate.&quot;
+      },
+      {
+        q: &quot;The Sultan Idris Training College (SITC), founded in 1922, served as a key institution for:&quot;,
+        options: [&quot;Training Malay vernacular school teachers and authors&quot;, &quot;Training British military officers&quot;, &quot;Educating foreign diplomats&quot;, &quot;Mining engineering research&quot;],
+        answer: 0,
+        explanation: &quot;SITC was a pivotal center for Malay intellectual growth, literature, and teacher training during the colonial era.&quot;
+      }
+    ];
+
+    let handsDetector = null;
+    let canvas = null;
+    let ctx = null;
+    let pipVideo = null;
+
+    window.addEventListener('DOMContentLoaded', () =&gt; {
+      canvas = document.getElementById('game-canvas');
+      ctx = canvas.getContext('2d');
+      pipVideo = document.getElementById('webcam-video');
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      prepareQuestions();
+      renderUI();
+
+      initFallbackMouseEvents();
+      requestWebcamAccess();
+
+      requestAnimationFrame(gameLoop);
+    });
+
+    function resizeCanvas() {
+      if (canvas) {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+    }
+
+    function prepareQuestions() {
+      GAME_STATE.questionQueue = [...QUESTION_BANK].sort(() =&gt; Math.random() - 0.5);
+    }
+
+    function renderUI() {
+      document.getElementById('score-display').textContent = `Score: ${GAME_STATE.score}`;
+      document.getElementById('q-counter-display').textContent = `${GAME_STATE.answeredCount}/10`;
+
+      const stageContainer = document.getElementById('stage-container');
+      if (!stageContainer) return;
+
+      if (GAME_STATE.mode === 'START') {
+        renderStartScreen(stageContainer);
+      } else if (GAME_STATE.mode === 'CATCHING') {
+        renderCatchingHUD(stageContainer);
+      } else if (GAME_STATE.mode === 'QUIZ') {
+        renderQuestionScreen(stageContainer);
+      } else if (GAME_STATE.mode === 'RESULTS') {
+        renderResultsScreen(stageContainer);
+      }
+    }
+
+    /* ==========================================================================
+       AUDIO SYNTHESIZER (WEB AUDIO API &amp; TONE.JS)
+       ========================================================================== */
+    const AudioEngine = {
+      ctx: null,
+      enabled: true,
+      musicEnabled: true,
+      bgMusicLoop: null,
+      synth: null,
+      bassSynth: null,
+      isPlayingMusic: false,
+      victoryApplauseInterval: null,
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      },
+
+      startBGM() {
+        if (!this.musicEnabled || this.isPlayingMusic) return;
+        try {
+          Tone.start();
+          if (!this.synth) {
+            this.synth = new Tone.PolySynth(Tone.Synth, {
+              oscillator: { type: &quot;sine&quot; },
+              envelope: { attack: 0.1, decay: 0.3, sustain: 0.6, release: 1.2 }
+            }).toDestination();
+            this.synth.volume.value = -16;
+
+            this.bassSynth = new Tone.MonoSynth({
+              oscillator: { type: &quot;triangle&quot; },
+              envelope: { attack: 0.2, decay: 0.4, sustain: 0.8, release: 1.5 }
+            }).toDestination();
+            this.bassSynth.volume.value = -20;
+
+            const chords = [
+              { chord: [&quot;C4&quot;, &quot;E4&quot;, &quot;G4&quot;, &quot;B4&quot;], bass: &quot;C3&quot; },
+              { chord: [&quot;A3&quot;, &quot;C4&quot;, &quot;E4&quot;, &quot;G4&quot;], bass: &quot;A2&quot; },
+              { chord: [&quot;F3&quot;, &quot;A3&quot;, &quot;C4&quot;, &quot;E4&quot;], bass: &quot;F2&quot; },
+              { chord: [&quot;G3&quot;, &quot;B3&quot;, &quot;D4&quot;, &quot;F4&quot;], bass: &quot;G2&quot; }
+            ];
+
+            let step = 0;
+            this.bgMusicLoop = new Tone.Loop((time) =&gt; {
+              const current = chords[step % chords.length];
+              this.synth.triggerAttackRelease(current.chord, &quot;2n&quot;, time);
+              this.bassSynth.triggerAttackRelease(current.bass, &quot;1n&quot;, time);
+              step++;
+            }, &quot;1m&quot;).start(0);
+
+            Tone.Transport.bpm.value = 82;
+          }
+          Tone.Transport.start();
+          this.isPlayingMusic = true;
+        } catch (e) {
+          console.warn(&quot;BGM initialization failed:&quot;, e);
+        }
+      },
+
+      stopBGM() {
+        if (this.isPlayingMusic) {
+          Tone.Transport.stop();
+          this.isPlayingMusic = false;
+        }
+      },
+
+      playCatchSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.15);
+        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.15);
+      },
+
+      playCorrectSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) =&gt; {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.08);
+          gain.gain.setValueAtTime(0.25, now + idx * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.08 + 0.25);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.08);
+          osc.stop(now + idx * 0.08 + 0.25);
+        });
+      },
+
+      playWrongSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const now = this.ctx.currentTime;
+        [220, 207.65, 196].forEach((freq, idx) =&gt; {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.12);
+          gain.gain.setValueAtTime(0.25, now + idx * 0.12);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.22);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.12);
+          osc.stop(now + idx * 0.12 + 0.22);
+        });
+      },
+
+      playClappingSound() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const bufferSize = this.ctx.sampleRate * 2.5;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i &lt; bufferSize; i++) {
+          data[i] = Math.random() * 2 - 1;
+        }
+
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1200;
+        filter.Q.value = 1.0;
+
+        const gain = this.ctx.createGain();
+        const now = this.ctx.currentTime;
+        gain.gain.setValueAtTime(0.01, now);
+        gain.gain.linearRampToValueAtTime(0.35, now + 0.3);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 2.5);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        noise.start(now);
+        noise.stop(now + 2.5);
+      },
+
+      playVictoryFanfare() {
+        if (!this.enabled) return;
+        this.init();
+        if (!this.ctx) return;
+
+        const notes = [523.25, 659.25, 783.99, 1046.50, 880, 1046.50];
+        const times = [0, 0.15, 0.30, 0.45, 0.65, 0.85];
+        const durations = [0.12, 0.12, 0.12, 0.18, 0.18, 0.5];
+
+        notes.forEach((freq, i) =&gt; {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + times[i]);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime + times[i]);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + times[i] + durations[i]);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + times[i]);
+          osc.stop(this.ctx.currentTime + times[i] + durations[i]);
+        });
+
+        setTimeout(() =&gt; this.playClappingSound(), 400);
+      },
+
+      startContinuousVictoryLoop() {
+        this.stopContinuousVictoryLoop();
+        this.playVictoryFanfare();
+        this.victoryApplauseInterval = setInterval(() =&gt; {
+          this.playVictoryFanfare();
+        }, 3000);
+      },
+
+      stopContinuousVictoryLoop() {
+        if (this.victoryApplauseInterval) {
+          clearInterval(this.victoryApplauseInterval);
+          this.victoryApplauseInterval = null;
+        }
+      }
+    };
+
+    /* ==========================================================================
+       MEDIAPIPE HAND TRACKING &amp; WEBCAM
+       ========================================================================== */
+    async function requestWebcamAccess() {
+      const statusText = document.getElementById('tracking-status-text');
+      const statusBox = document.getElementById('tracking-status');
+      const statusDot = document.getElementById('tracking-dot');
+
+      try {
+        statusText.textContent = &quot;Loading Model...&quot;;
+
+        if (typeof Hands === 'undefined') {
+          throw new Error('MediaPipe Hands script failed to load');
+        }
+
+        handsDetector = new Hands({
+          locateFile: (file) =&gt; `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        handsDetector.setOptions({
+          maxNumHands: 1,
+          modelComplexity: 1,
+          minDetectionConfidence: 0.2,
+          minTrackingConfidence: 0.2
+        });
+
+        handsDetector.onResults(onHandsResults);
+
+        statusText.textContent = &quot;Cam Starting...&quot;;
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: 'user',
+            width: { ideal: 640 },
+            height: { ideal: 480 },
+            frameRate: { ideal: 30 }
+          },
+          audio: false
+        });
+
+        pipVideo.srcObject = stream;
+        await pipVideo.play();
+
+        GAME_STATE.cameraActive = true;
+        
+        async function processFrame() {
+          if (GAME_STATE.cameraActive &amp;&amp; handsDetector &amp;&amp; pipVideo.readyState &gt;= 2) {
+            try {
+              await handsDetector.send({ image: pipVideo });
+            } catch (err) {
+              console.warn(&quot;Hand frame error:&quot;, err);
+            }
+          }
+          if (GAME_STATE.cameraActive) {
+            requestAnimationFrame(processFrame);
+          }
+        }
+        requestAnimationFrame(processFrame);
+
+        statusBox.className = &quot;flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-emerald-950/80 border border-emerald-600/50 text-emerald-300 backdrop-blur&quot;;
+        statusDot.className = &quot;w-2 h-2 rounded-full bg-emerald-400 animate-ping&quot;;
+        statusText.textContent = &quot;Ready - Show Hand&quot;;
+        document.getElementById('toggle-camera-btn').textContent = &quot;Disable Camera&quot;;
+
+      } catch (err) {
+        console.warn(&quot;Webcam access / MediaPipe error:&quot;, err);
+        statusBox.className = &quot;flex items-center space-x-1 sm:space-x-1.5 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold bg-amber-950/80 border border-amber-600/50 text-amber-300 backdrop-blur&quot;;
+        statusDot.className = &quot;w-2 h-2 rounded-full bg-amber-500&quot;;
+        statusText.textContent = &quot;Touch/Mouse Mode&quot;;
+        GAME_STATE.cameraActive = false;
+      }
+    }
+
+    function toggleCameraState() {
+      if (GAME_STATE.cameraActive) {
+        if (pipVideo &amp;&amp; pipVideo.srcObject) {
+          pipVideo.srcObject.getTracks().forEach(track =&gt; track.stop());
+        }
+        GAME_STATE.cameraActive = false;
+        document.getElementById('tracking-status-text').textContent = &quot;Touch/Mouse Mode&quot;;
+        document.getElementById('toggle-camera-btn').textContent = &quot;Enable Camera&quot;;
+      } else {
+        requestWebcamAccess();
+      }
+    }
+
+    /* ==========================================================================
+       GESTURE RECOGNITION &amp; CURSOR
+       ========================================================================== */
+    function onHandsResults(results) {
+      const statusText = document.getElementById('tracking-status-text');
+      const statusDot = document.getElementById('tracking-dot');
+
+      if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
+        if (GAME_STATE.trackingLossTimer &gt; 0) {
+          GAME_STATE.trackingLossTimer--;
+        } else {
+          if (GAME_STATE.trackingDetected) {
+            GAME_STATE.trackingDetected = false;
+            GAME_STATE.landmarks = null;
+            if (statusText) statusText.textContent = &quot;Ready - Show Hand&quot;;
+            if (statusDot) statusDot.className = &quot;w-2 h-2 rounded-full bg-emerald-400 animate-ping&quot;;
+          }
+        }
+        return;
+      }
+
+      const handLandmarks = results.multiHandLandmarks[0];
+
+      GAME_STATE.trackingLossTimer = 15;
+      GAME_STATE.trackingDetected = true;
+      GAME_STATE.landmarks = handLandmarks;
+
+      if (statusText) statusText.textContent = &quot;Hand Detected ✓&quot;;
+      if (statusDot) statusDot.className = &quot;w-2 h-2 rounded-full bg-emerald-400&quot;;
+
+      const wrist = handLandmarks[0];
+      const indexTip = handLandmarks[8];
+      const indexPip = handLandmarks[6];
+      const middleTip = handLandmarks[12];
+      const middlePip = handLandmarks[10];
+      const ringTip = handLandmarks[16];
+      const ringPip = handLandmarks[14];
+      const pinkyTip = handLandmarks[20];
+      const pinkyPip = handLandmarks[18];
+
+      const targetX = 1.0 - indexTip.x;
+      const targetY = indexTip.y;
+
+      const smoothing = 0.45;
+      GAME_STATE.cursor.x += (targetX - GAME_STATE.cursor.x) * smoothing;
+      GAME_STATE.cursor.y += (targetY - GAME_STATE.cursor.y) * smoothing;
+
+      // 1. OPEN PALM (✋) - For catching falling objects
+      const dIndexTip = Math.hypot(indexTip.x - wrist.x, indexTip.y - wrist.y);
+      const dMiddleTip = Math.hypot(middleTip.x - wrist.x, middleTip.y - wrist.y);
+      const dRingTip = Math.hypot(ringTip.x - wrist.x, ringTip.y - wrist.y);
+      const dPinkyTip = Math.hypot(pinkyTip.x - wrist.x, pinkyTip.y - wrist.y);
+
+      const dIndexPip = Math.hypot(indexPip.x - wrist.x, indexPip.y - wrist.y);
+      const dMiddlePip = Math.hypot(middlePip.x - wrist.x, middlePip.y - wrist.y);
+      const dRingPip = Math.hypot(ringPip.x - wrist.x, ringPip.y - wrist.y);
+      const dPinkyPip = Math.hypot(pinkyPip.x - wrist.x, pinkyPip.y - wrist.y);
+
+      const allExtended = (dIndexTip &gt; dIndexPip * 1.1) &amp;&amp;
+                          (dMiddleTip &gt; dMiddlePip * 1.1) &amp;&amp;
+                          (dRingTip &gt; dRingPip * 1.1) &amp;&amp;
+                          (dPinkyTip &gt; dPinkyPip * 1.1);
+
+      GAME_STATE.cursor.isOpenHand = allExtended;
+
+      // 2. POINTING GESTURE (👉) - For selecting quiz options
+      const indexExtended = dIndexTip &gt; dIndexPip * 1.15;
+      const othersCurled = (dMiddleTip &lt; dMiddlePip * 1.05) &amp;&amp;
+                           (dRingTip &lt; dRingPip * 1.05) &amp;&amp;
+                           (dPinkyTip &lt; dPinkyPip * 1.05);
+
+      GAME_STATE.cursor.isPointing = indexExtended &amp;&amp; othersCurled &amp;&amp; !allExtended;
+
+      updateVirtualCursorPos();
+    }
+
+    function initFallbackMouseEvents() {
+      window.addEventListener('mousemove', (e) =&gt; {
+        if (!GAME_STATE.trackingDetected) {
+          GAME_STATE.cursor.x = e.clientX / window.innerWidth;
+          GAME_STATE.cursor.y = e.clientY / window.innerHeight;
+          updateVirtualCursorPos();
+        }
+      });
+
+      window.addEventListener('mousedown', () =&gt; {
+        if (!GAME_STATE.trackingDetected) {
+          if (GAME_STATE.mode === 'CATCHING') {
+            GAME_STATE.cursor.isOpenHand = true;
+          } else {
+            GAME_STATE.cursor.isPointing = true;
+          }
+          triggerInteractionAtCursor();
+        }
+      });
+
+      window.addEventListener('mouseup', () =&gt; {
+        if (!GAME_STATE.trackingDetected) {
+          GAME_STATE.cursor.isPointing = false;
+          GAME_STATE.cursor.isOpenHand = false;
+        }
+      });
+
+      window.addEventListener('touchstart', (e) =&gt; {
+        if (!GAME_STATE.trackingDetected &amp;&amp; e.touches.length &gt; 0) {
+          const touch = e.touches[0];
+          GAME_STATE.cursor.x = touch.clientX / window.innerWidth;
+          GAME_STATE.cursor.y = touch.clientY / window.innerHeight;
+          if (GAME_STATE.mode === 'CATCHING') {
+            GAME_STATE.cursor.isOpenHand = true;
+          } else {
+            GAME_STATE.cursor.isPointing = true;
+          }
+          updateVirtualCursorPos();
+          triggerInteractionAtCursor();
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchmove', (e) =&gt; {
+        if (!GAME_STATE.trackingDetected &amp;&amp; e.touches.length &gt; 0) {
+          const touch = e.touches[0];
+          GAME_STATE.cursor.x = touch.clientX / window.innerWidth;
+          GAME_STATE.cursor.y = touch.clientY / window.innerHeight;
+          updateVirtualCursorPos();
+        }
+      }, { passive: true });
+
+      window.addEventListener('touchend', () =&gt; {
+        if (!GAME_STATE.trackingDetected) {
+          GAME_STATE.cursor.isPointing = false;
+          GAME_STATE.cursor.isOpenHand = false;
+        }
+      });
+    }
+
+    function updateVirtualCursorPos() {
+      const cursorEl = document.getElementById('dwell-cursor');
+      const iconEl = document.getElementById('dwell-icon');
+      if (!cursorEl) return;
+
+      const pxX = GAME_STATE.cursor.x * window.innerWidth;
+      const pxY = GAME_STATE.cursor.y * window.innerHeight;
+
+      cursorEl.style.left = `${pxX}px`;
+      cursorEl.style.top = `${pxY}px`;
+      cursorEl.classList.remove('hidden');
+
+      if (GAME_STATE.cursor.isOpenHand) {
+        if (iconEl) iconEl.textContent = &quot;✋&quot;;
+        cursorEl.classList.add('scale-125', 'border-sky-400', 'bg-sky-500/30');
+        cursorEl.classList.remove('border-amber-400', 'border-emerald-400', 'bg-emerald-500/30');
+      } else if (GAME_STATE.cursor.isPointing) {
+        if (iconEl) iconEl.textContent = &quot;👉&quot;;
+        cursorEl.classList.add('scale-125', 'border-emerald-400', 'bg-emerald-500/30');
+        cursorEl.classList.remove('border-amber-400', 'border-sky-400', 'bg-sky-500/30');
+      } else {
+        if (iconEl) iconEl.textContent = &quot;✋&quot;;
+        cursorEl.classList.remove('scale-125', 'border-emerald-400', 'border-sky-400', 'bg-emerald-500/30', 'bg-sky-500/30');
+        cursorEl.classList.add('border-amber-400');
+      }
+
+      checkInteractions(pxX, pxY);
+    }
+
+    function checkInteractions(pxX, pxY) {
+      if (GAME_STATE.cooldown) return;
+
+      if (GAME_STATE.mode === 'CATCHING') {
+        // ONLY OPEN PALM can catch falling objects
+        if (!GAME_STATE.cursor.isOpenHand &amp;&amp; GAME_STATE.cameraActive) {
+          return;
+        }
+
+        const artifacts = document.querySelectorAll('.floating-artifact');
+        for (const artifact of artifacts) {
+          const rect = artifact.getBoundingClientRect();
+          const pad = 30;
+          if (
+            pxX &gt;= rect.left - pad &amp;&amp;
+            pxX &lt;= rect.right + pad &amp;&amp;
+            pxY &gt;= rect.top - pad &amp;&amp;
+            pxY &lt;= rect.bottom + pad
+          ) {
+            catchArtifact(artifact);
+            return;
+          }
+        }
+        return;
+      }
+
+      if (GAME_STATE.mode === 'QUIZ') {
+        // ONLY POINTING GESTURE can select answer options or next buttons when camera active
+        if (GAME_STATE.cameraActive &amp;&amp; !GAME_STATE.cursor.isPointing) {
+          resetDwellProgress();
+          return;
+        }
+      }
+
+      if (GAME_STATE.cursor.isPointing || (!GAME_STATE.cameraActive)) {
+        triggerInteractionAtCursor();
+        return;
+      }
+
+      if (GAME_STATE.dwellEnabled &amp;&amp; GAME_STATE.mode !== 'CATCHING') {
+        const hoveredElem = document.elementFromPoint(pxX, pxY);
+        const interactiveTarget = hoveredElem?.closest('[data-interactive=&quot;true&quot;]');
+
+        if (interactiveTarget) {
+          if (GAME_STATE.dwellTarget !== interactiveTarget) {
+            GAME_STATE.dwellTarget = interactiveTarget;
+            GAME_STATE.dwellStartTime = Date.now();
+          } else {
+            const elapsed = Date.now() - GAME_STATE.dwellStartTime;
+            const progress = Math.min(elapsed / GAME_STATE.dwellDuration, 1.0);
+            const fill = document.getElementById('dwell-fill');
+            if (fill) fill.style.transform = `scale(${progress})`;
+
+            if (progress &gt;= 1.0) {
+              triggerInteractiveElement(interactiveTarget);
+              resetDwellProgress();
+            }
+          }
+        } else {
+          resetDwellProgress();
+        }
+      } else {
+        resetDwellProgress();
+      }
+    }
+
+    function resetDwellProgress() {
+      GAME_STATE.dwellTarget = null;
+      GAME_STATE.dwellStartTime = 0;
+      const fill = document.getElementById('dwell-fill');
+      if (fill) fill.style.transform = 'scale(0)';
+    }
+
+    function triggerInteractionAtCursor() {
+      if (GAME_STATE.cooldown) return;
+      const pxX = GAME_STATE.cursor.x * window.innerWidth;
+      const pxY = GAME_STATE.cursor.y * window.innerHeight;
+      const hoveredElem = document.elementFromPoint(pxX, pxY);
+      const interactiveTarget = hoveredElem?.closest('[data-interactive=&quot;true&quot;]');
+
+      if (interactiveTarget) triggerInteractiveElement(interactiveTarget);
+    }
+
+    function triggerInteractiveElement(elem) {
+      const action = elem.getAttribute('data-action');
+      const param = elem.getAttribute('data-param');
+      if (!action) return;
+
+      GAME_STATE.cooldown = true;
+      setTimeout(() =&gt; GAME_STATE.cooldown = false, 500);
+
+      if (action === 'start-game') {
+        startGame();
+      } else if (action === 'catch-artifact') {
+        catchArtifact(elem);
+      } else if (action === 'select-quiz') {
+        submitQuizAnswer(parseInt(param, 10));
+      } else if (action === 'next-question') {
+        resumeCatchingOrFinish();
+      } else if (action === 'restart-game') {
+        resetGame();
+      }
+    }
+
+    /* ==========================================================================
+       CATCHING GAME ENGINE
+       ========================================================================== */
+    function startGame() {
+      AudioEngine.init();
+      AudioEngine.startBGM();
+      GAME_STATE.score = 0;
+      GAME_STATE.answeredCount = 0;
+      GAME_STATE.mode = 'CATCHING';
+      prepareQuestions();
+      renderUI();
+      spawnArtifacts();
+    }
+
+    function spawnArtifacts() {
+      const container = document.getElementById('floating-artifacts-layer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (GAME_STATE.mode !== 'CATCHING') return;
+
+      const numArtifacts = 4;
+      const placedPositions = [];
+
+      for (let i = 0; i &lt; numArtifacts; i++) {
+        let leftPercent = 10;
+        let attempts = 0;
+        let valid = false;
+
+        while (!valid &amp;&amp; attempts &lt; 25) {
+          leftPercent = 10 + Math.random() * 75;
+          valid = placedPositions.every(pos =&gt; Math.abs(pos - leftPercent) &gt;= 18);
+          attempts++;
+        }
+
+        placedPositions.push(leftPercent);
+        createArtifactElement(container, leftPercent, i * 1.5);
+      }
+    }
+
+    function createArtifactElement(container, leftPercent, delaySeconds = 0) {
+      const artifact = document.createElement('div');
+      const icon = ARTIFACT_ICONS[Math.floor(Math.random() * ARTIFACT_ICONS.length)];
+      const duration = 6.5 + Math.random() * 3.5;
+
+      artifact.className = &quot;floating-artifact pointer-events-auto p-4 rounded-2xl bg-stone-900/90 border-2 border-sepia-500 shadow-2xl flex items-center justify-center text-4xl hover:scale-125 transition transform&quot;;
+      artifact.style.left = `${leftPercent}%`;
+      artifact.style.animationDuration = `${duration}s`;
+      artifact.style.animationDelay = `${delaySeconds}s`;
+      artifact.setAttribute('data-interactive', 'true');
+      artifact.setAttribute('data-action', 'catch-artifact');
+      artifact.innerHTML = `&lt;span&gt;${icon}&lt;/span&gt;`;
+
+      container.appendChild(artifact);
+    }
+
+    function catchArtifact(elem) {
+      if (GAME_STATE.mode !== 'CATCHING') return;
+
+      GAME_STATE.cooldown = true;
+      setTimeout(() =&gt; GAME_STATE.cooldown = false, 600);
+
+      AudioEngine.playCatchSound();
+
+      elem.style.transform = &quot;scale(1.8) rotate(20deg)&quot;;
+      elem.style.opacity = &quot;0&quot;;
+
+      setTimeout(() =&gt; {
+        if (elem.parentNode) elem.parentNode.removeChild(elem);
+      }, 200);
+
+      triggerRandomQuestion();
+    }
+
+    function triggerRandomQuestion() {
+      if (GAME_STATE.questionQueue.length === 0) prepareQuestions();
+
+      GAME_STATE.activeQuestion = GAME_STATE.questionQueue.pop();
+      GAME_STATE.activeQuestion.userAnswer = null;
+      GAME_STATE.mode = 'QUIZ';
+
+      const container = document.getElementById('floating-artifacts-layer');
+      if (container) container.innerHTML = '';
+
+      renderUI();
+    }
+
+    function submitQuizAnswer(ansIdx) {
+      if (GAME_STATE.activeQuestion.userAnswer !== null) return;
+
+      GAME_STATE.activeQuestion.userAnswer = ansIdx;
+      const isCorrect = (ansIdx === GAME_STATE.activeQuestion.answer);
+
+      if (isCorrect) {
+        GAME_STATE.score += 10;
+        AudioEngine.playCorrectSound();
+      } else {
+        AudioEngine.playWrongSound();
+      }
+
+      GAME_STATE.answeredCount++;
+      renderUI();
+    }
+
+    function resumeCatchingOrFinish() {
+      if (GAME_STATE.answeredCount &gt;= 10) {
+        GAME_STATE.mode = 'RESULTS';
+        renderUI();
+        triggerVictoryEffects();
+      } else {
+        GAME_STATE.mode = 'CATCHING';
+        renderUI();
+        spawnArtifacts();
+      }
+    }
+
+    function resetGame() {
+      AudioEngine.stopContinuousVictoryLoop();
+      GAME_STATE.score = 0;
+      GAME_STATE.answeredCount = 0;
+      GAME_STATE.mode = 'START';
+      renderUI();
+    }
+
+    function triggerVictoryEffects() {
+      AudioEngine.startContinuousVictoryLoop();
+
+      if (typeof confetti === 'function') {
+        window.isVictoryActive = true;
+
+        (function continuousConfettiFrame() {
+          if (!window.isVictoryActive || GAME_STATE.mode !== 'RESULTS') return;
+
+          confetti({
+            particleCount: 8,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ['#f59e0b', '#10b981', '#3b82f6', '#d97706']
+          });
+          confetti({
+            particleCount: 8,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ['#f59e0b', '#10b981', '#3b82f6', '#d97706']
+          });
+
+          setTimeout(continuousConfettiFrame, 350);
+        })();
+      }
+    }
+
+    /* ==========================================================================
+       UI RENDERERS
+       ========================================================================== */
+    function renderStartScreen(container) {
+      container.innerHTML = `
+        &lt;div class=&quot;text-center max-w-2xl bg-stone-950/85 border border-sepia-700/70 p-4 sm:p-8 rounded-2xl backdrop-blur-md shadow-2xl space-y-4 sm:space-y-6 mx-auto my-auto&quot;&gt;
+          &lt;div class=&quot;inline-block px-2.5 py-0.5 rounded-full bg-sepia-900/60 border border-sepia-600/50 text-sepia-300 text-[10px] sm:text-xs font-mono uppercase tracking-widest&quot;&gt;
+            Motion &amp; Touch Educational Quiz
+          &lt;/div&gt;
+          &lt;h1 class=&quot;text-2xl sm:text-4xl font-serif font-bold text-sepia-200 tracking-tight leading-tight&quot;&gt;
+            Journey Through Colonial Education
+          &lt;/h1&gt;
+          &lt;p class=&quot;text-stone-300 text-xs sm:text-base leading-relaxed&quot;&gt;
+            Catch falling artifacts using an &lt;b&gt;Open Palm&lt;/b&gt; (✋) and select quiz answers using your &lt;b&gt;Pointing Finger&lt;/b&gt; (👉)!
+          &lt;/p&gt;
+
+          &lt;div class=&quot;grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 my-4 text-left text-xs sm:text-sm bg-stone-900/90 p-3 sm:p-4 rounded-xl border border-stone-800&quot;&gt;
+            &lt;div class=&quot;flex items-center space-x-3&quot;&gt;
+              &lt;span class=&quot;text-xl sm:text-2xl&quot;&gt;✋&lt;/span&gt;
+              &lt;div&gt;
+                &lt;div class=&quot;font-bold text-sepia-300 text-xs sm:text-sm&quot;&gt;Catch Artifacts&lt;/div&gt;
+                &lt;div class=&quot;text-stone-400 text-[11px] sm:text-xs&quot;&gt;Show an &lt;b&gt;Open Palm&lt;/b&gt; over falling artifacts&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+            &lt;div class=&quot;flex items-center space-x-3&quot;&gt;
+              &lt;span class=&quot;text-xl sm:text-2xl&quot;&gt;👉&lt;/span&gt;
+              &lt;div&gt;
+                &lt;div class=&quot;font-bold text-sepia-300 text-xs sm:text-sm&quot;&gt;Pick Answers&lt;/div&gt;
+                &lt;div class=&quot;text-stone-400 text-[11px] sm:text-xs&quot;&gt;&lt;b&gt;Point with Index Finger&lt;/b&gt; to select answers&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+          &lt;/div&gt;
+
+          &lt;button data-interactive=&quot;true&quot; data-action=&quot;start-game&quot; class=&quot;w-full sm:w-auto px-6 py-3 sm:px-8 sm:py-4 bg-sepia-700 hover:bg-sepia-600 text-stone-100 font-serif font-bold rounded-xl border border-sepia-500 shadow-xl transform transition active:scale-95 flex items-center justify-center space-x-2 mx-auto text-sm sm:text-base&quot;&gt;
+            &lt;span&gt;Start Adventure Game&lt;/span&gt;
+            &lt;span class=&quot;text-base sm:text-lg&quot;&gt;➔&lt;/span&gt;
+          &lt;/button&gt;
+        &lt;/div&gt;
+      `;
+    }
+
+    function renderCatchingHUD(container) {
+      container.innerHTML = `
+        &lt;div class=&quot;w-full h-full flex flex-col justify-start pt-2 pointer-events-none&quot;&gt;
+          &lt;div class=&quot;self-center bg-stone-950/80 border border-sepia-600/60 px-4 py-2 rounded-xl backdrop-blur text-center shadow-lg&quot;&gt;
+            &lt;p class=&quot;text-xs sm:text-sm font-semibold text-sepia-200&quot;&gt;
+              ✋ Show an OPEN PALM over falling artifacts to catch them!
+            &lt;/p&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      `;
+    }
+
+    function renderQuestionScreen(container) {
+      const q = GAME_STATE.activeQuestion;
+      const hasAnswered = q.userAnswer !== null;
+      const selectedAnswer = q.userAnswer;
+
+      container.innerHTML = `
+        &lt;div class=&quot;w-full max-w-3xl mx-auto flex flex-col justify-between p-2 sm:p-4 space-y-3 sm:space-y-4 my-auto&quot;&gt;
+          &lt;!-- Question Box --&gt;
+          &lt;div class=&quot;bg-stone-950/90 border border-sepia-700/80 p-3.5 sm:p-5 rounded-2xl shadow-xl backdrop-blur-md text-center shrink-0&quot;&gt;
+            &lt;div class=&quot;flex justify-between items-center text-[10px] sm:text-xs font-mono text-sepia-400 mb-1.5&quot;&gt;
+              &lt;span class=&quot;bg-sepia-900/60 px-2 py-0.5 rounded border border-sepia-700/50&quot;&gt;Artifact Unlocked! Question ${GAME_STATE.answeredCount + (hasAnswered ? 0 : 1)}/10&lt;/span&gt;
+              &lt;span class=&quot;text-amber-400 font-bold&quot;&gt;+10 Points&lt;/span&gt;
+            &lt;/div&gt;
+            &lt;h2 class=&quot;font-serif text-sm sm:text-xl font-bold text-sepia-200 leading-snug sm:leading-normal&quot;&gt;${q.q}&lt;/h2&gt;
+          &lt;/div&gt;
+
+          &lt;!-- Answer Options Grid --&gt;
+          &lt;div class=&quot;grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3&quot;&gt;
+            ${q.options.map((optionText, idx) =&gt; {
+              let cardStyle = &quot;bg-stone-900/90 border-sepia-700/70 hover:border-amber-400/80 text-stone-200&quot;;
+              
+              if (hasAnswered) {
+                if (idx === q.answer) {
+                  cardStyle = &quot;bg-emerald-950/90 border-emerald-500 text-emerald-200 font-bold ring-2 ring-emerald-500/30&quot;;
+                } else if (idx === selectedAnswer) {
+                  cardStyle = &quot;bg-rose-950/90 border-rose-600 text-rose-200 opacity-80&quot;;
+                } else {
+                  cardStyle = &quot;bg-stone-900/40 border-stone-800 text-stone-500 opacity-50 pointer-events-none&quot;;
+                }
+              }
+
+              return `
+                &lt;div data-interactive=&quot;true&quot; data-action=&quot;select-quiz&quot; data-param=&quot;${idx}&quot; class=&quot;p-3 sm:p-3.5 rounded-xl border ${cardStyle} transition cursor-pointer flex items-center space-x-3 shadow-lg active:scale-98&quot;&gt;
+                  &lt;span class=&quot;w-6 h-6 sm:w-7 sm:h-7 rounded-full border border-sepia-600/60 flex items-center justify-center font-mono font-bold text-[10px] sm:text-xs bg-stone-950 shrink-0&quot;&gt;
+                    ${['A','B','C','D'][idx]}
+                  &lt;/span&gt;
+                  &lt;span class=&quot;text-xs sm:text-sm leading-snug font-medium&quot;&gt;${optionText}&lt;/span&gt;
+                &lt;/div&gt;
+              `;
+            }).join('')}
+          &lt;/div&gt;
+
+          &lt;!-- Explanation / Feedback Banner --&gt;
+          &lt;div class=&quot;bg-stone-950/90 border border-stone-800 p-3 sm:p-4 rounded-xl text-center min-h-[70px] flex flex-col justify-center items-center shadow-lg shrink-0&quot;&gt;
+            ${hasAnswered ? `
+              &lt;div class=&quot;space-y-1.5 sm:space-y-2 w-full&quot;&gt;
+                &lt;div class=&quot;text-xs sm:text-sm font-serif ${selectedAnswer === q.answer ? 'text-emerald-400 font-bold' : 'text-rose-400 font-bold'}&quot;&gt;
+                  ${selectedAnswer === q.answer ? '✓ Correct! (+10 Points)' : '✕ Incorrect'}
+                &lt;/div&gt;
+                &lt;div class=&quot;text-[11px] sm:text-xs text-stone-300 max-w-xl mx-auto leading-relaxed&quot;&gt;${q.explanation}&lt;/div&gt;
+                &lt;button data-interactive=&quot;true&quot; data-action=&quot;next-question&quot; class=&quot;mt-1 sm:mt-2 px-5 py-2 bg-sepia-700 hover:bg-sepia-600 text-white font-serif font-bold text-xs sm:text-sm rounded-lg border border-sepia-500 shadow-md transform transition hover:scale-105 active:scale-95 inline-flex items-center space-x-1.5&quot;&gt;
+                  &lt;span&gt;${GAME_STATE.answeredCount &lt; 10 ? 'Catch Next Artifact' : 'View Final Results'}&lt;/span&gt;
+                  &lt;span&gt;➔&lt;/span&gt;
+                &lt;/button&gt;
+              &lt;/div&gt;
+            ` : `
+              &lt;span class=&quot;text-[11px] sm:text-xs text-stone-400 italic&quot;&gt;Point with your index finger (👉) or tap an answer card to select.&lt;/span&gt;
+            `}
+          &lt;/div&gt;
+        &lt;/div&gt;
+      `;
+    }
+
+    function renderResultsScreen(container) {
+      window.isVictoryActive = true;
+
+      container.innerHTML = `
+        &lt;div class=&quot;w-full max-w-2xl mx-auto p-2 text-center my-auto&quot;&gt;
+          &lt;div class=&quot;bg-stone-950/90 border border-sepia-700 p-6 sm:p-8 rounded-2xl shadow-2xl backdrop-blur-md space-y-5&quot;&gt;
+            &lt;span class=&quot;text-xs font-mono text-amber-400 uppercase tracking-widest&quot;&gt;👏 Adventure Completed!&lt;/span&gt;
+            &lt;h2 class=&quot;font-serif text-2xl sm:text-4xl font-bold text-sepia-200&quot;&gt;Historical Master&lt;/h2&gt;
+
+            &lt;div class=&quot;grid grid-cols-2 gap-4 my-4&quot;&gt;
+              &lt;div class=&quot;p-4 bg-stone-900/90 border border-sepia-800 rounded-xl&quot;&gt;
+                &lt;div class=&quot;text-2xl sm:text-3xl font-serif font-bold text-amber-400&quot;&gt;${GAME_STATE.score} / 100&lt;/div&gt;
+                &lt;div class=&quot;text-[11px] sm:text-xs text-stone-400 uppercase tracking-wider mt-1&quot;&gt;Total Score&lt;/div&gt;
+              &lt;/div&gt;
+              &lt;div class=&quot;p-4 bg-stone-900/90 border border-sepia-800 rounded-xl&quot;&gt;
+                &lt;div class=&quot;text-2xl sm:text-3xl font-serif font-bold text-emerald-400&quot;&gt;${GAME_STATE.score / 10} / 10&lt;/div&gt;
+                &lt;div class=&quot;text-[11px] sm:text-xs text-stone-400 uppercase tracking-wider mt-1&quot;&gt;Correct Answers&lt;/div&gt;
+              &lt;/div&gt;
+            &lt;/div&gt;
+
+            &lt;p class=&quot;text-stone-300 text-xs sm:text-sm max-w-md mx-auto&quot;&gt;
+              ${GAME_STATE.score &gt;= 80 ? &quot;Outstanding achievement! You have mastered the history of educational evolution in British Malaya.&quot; : &quot;Great effort! Replay the adventure to catch more artifacts and master colonial education history.&quot;}
+            &lt;/p&gt;
+
+            &lt;button data-interactive=&quot;true&quot; data-action=&quot;restart-game&quot; class=&quot;px-8 py-3 bg-sepia-700 hover:bg-sepia-600 text-white font-serif font-bold text-sm rounded-xl border border-sepia-500 shadow-xl transition&quot;&gt;
+              Play Catch Game Again 🔄
+            &lt;/button&gt;
+          &lt;/div&gt;
+        &lt;/div&gt;
+      `;
+    }
+
+    /* ==========================================================================
+       ANIMATION LOOP &amp; LANDMARK OVERLAY
+       ========================================================================== */
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (GAME_STATE.trackingDetected &amp;&amp; GAME_STATE.landmarks) {
+        drawHandOverlayOnMainCanvas(GAME_STATE.landmarks);
+      }
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function drawHandOverlayOnMainCanvas(landmarks) {
+      if (!landmarks) return;
+
+      const HAND_CONNECTIONS = [
+        [0,1],[1,2],[2,3],[3,4],
+        [0,5],[5,6],[6,7],[7,8],
+        [5,9],[9,10],[10,11],[11,12],
+        [9,13],[13,14],[14,15],[15,16],
+        [13,17],[17,18],[18,19],[19,20],
+        [0,17]
+      ];
+
+      ctx.lineWidth = 4;
+      if (GAME_STATE.cursor.isOpenHand) {
+        ctx.strokeStyle = 'rgba(56, 189, 248, 0.9)';
+      } else if (GAME_STATE.cursor.isPointing) {
+        ctx.strokeStyle = 'rgba(52, 211, 153, 0.9)';
+      } else {
+        ctx.strokeStyle = 'rgba(245, 158, 11, 0.8)';
+      }
+
+      for (const [start, end] of HAND_CONNECTIONS) {
+        const p1 = landmarks[start];
+        const p2 = landmarks[end];
+
+        const x1 = (1.0 - p1.x) * canvas.width;
+        const y1 = p1.y * canvas.height;
+        const x2 = (1.0 - p2.x) * canvas.width;
+        const y2 = p2.y * canvas.height;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      }
+
+      for (let i = 0; i &lt; landmarks.length; i++) {
+        const lm = landmarks[i];
+        const x = (1.0 - lm.x) * canvas.width;
+        const y = lm.y * canvas.height;
+
+        ctx.beginPath();
+        if (i === 4 || i === 8 || i === 12 || i === 16 || i === 20) {
+          ctx.arc(x, y, 8, 0, Math.PI * 2);
+          if (GAME_STATE.cursor.isOpenHand) {
+            ctx.fillStyle = '#38bdf8';
+          } else if (GAME_STATE.cursor.isPointing) {
+            ctx.fillStyle = '#34d399';
+          } else {
+            ctx.fillStyle = '#f59e0b';
+          }
+        } else {
+          ctx.arc(x, y, 5, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(251, 191, 36, 0.9)';
+        }
+        ctx.fill();
+      }
+    }
+
+    function toggleSettingsModal() {
+      document.getElementById('settings-modal').classList.toggle('hidden');
+    }
+
+    function updateDwellSetting() {
+      GAME_STATE.dwellEnabled = document.getElementById('dwell-toggle').checked;
+    }
+
+    function updateSoundSetting() {
+      AudioEngine.enabled = document.getElementById('sound-toggle').checked;
+    }
+
+    function updateMusicSetting() {
+      AudioEngine.musicEnabled = document.getElementById('music-toggle').checked;
+      if (AudioEngine.musicEnabled &amp;&amp; GAME_STATE.mode !== 'START') {
+        AudioEngine.startBGM();
+      } else {
+        AudioEngine.stopBGM();
+      }
+    }
+
+    function openDirectLink() {
+      window.open(window.location.href, '_blank');
+    }
+
+    function copyDirectLink() {
+      navigator.clipboard.writeText(window.location.href).then(() =&gt; {
+        const btn = document.getElementById('copy-btn');
+        if (btn) {
+          btn.textContent = &quot;Copied!&quot;;
+          setTimeout(() =&gt; btn.textContent = &quot;Copy Link&quot;, 2000);
+        }
+      });
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+</body>
+</html>
